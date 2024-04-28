@@ -191,8 +191,15 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- neotest keybinds
-vim.keymap.set('n', '<leader>tn', ':lua require("neotest").run.run()<CR>', { desc = 'Test nearest' })
-vim.keymap.set('n', '<leader>tf', ':lua require("neotest").run.run(vim.fn.expand("%"))<CR>', { desc = 'Test file' })
+vim.keymap.set('n', 'tn', ':lua require("neotest").run.run()<CR>', { desc = 'Test nearest' })
+vim.keymap.set('n', 'tf', ':lua require("neotest").run.run(vim.fn.expand("%"))<CR>', { desc = 'Test file' })
+vim.keymap.set('n', 'to', ':lua require("neotest").output.open({ enter = true })<CR>')
+vim.keymap.set('n', 'ts', ':lua require("neotest").summary.open()<CR>')
+vim.keymap.set('n', 'tt', ':lua require("neotest").summary.toggle()<CR>')
+vim.keymap.set('n', 'tq', ':lua require("neotest").output_panel.close()<CR>')
+
+-- Cody keybinds
+vim.keymap.set('n', '<C-t>', ':CodyChat<CR>', { desc = 'Cody chat' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -983,16 +990,16 @@ require('neotest').setup {
       dap = { justMyCode = false },
       -- Command line arguments for runner
       -- Can also be a function to return dynamic values
-      args = { '--log-level', 'DEBUG' },
+      -- args = { '--log-level', 'DEBUG' },
       -- Runner to use. Will use pytest if available by default.
       -- Can be a function to return dynamic value.
-      runner = 'django', -- or "django", "unittest"
+      -- runner = 'django', -- or "django", "unittest"
       -- Custom python path for the runner.
       -- Can be a string or a list of strings.
       -- Can also be a function to return dynamic value.
       -- If not provided, the path will be inferred by checking for
       -- virtual envs in the local directory and for Pipenev/Poetry configs
-      python = '.venv/bin/python',
+      --python = '.venv/bin/python',
       -- Returns if a given file path is a test file.
       -- NB: This function is called a lot so don't perform any heavy tasks within it.
       -- is_test_file = function(file_path)
