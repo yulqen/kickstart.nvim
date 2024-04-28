@@ -87,7 +87,7 @@ P.S. You can delete this when you're done too. It's your config now! :)
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
-vim.g.mapleader = ' '
+vim.g.mapleader = ','
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
@@ -190,6 +190,10 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- neotest keybinds
+vim.keymap.set('n', '<leader>tn', ':lua require("neotest").run.run()<CR>', { desc = 'Test nearest' })
+vim.keymap.set('n', '<leader>tf', ':lua require("neotest").run.run(vim.fn.expand("%"))<CR>', { desc = 'Test file' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -255,6 +259,33 @@ require('lazy').setup({
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
       },
+    },
+  },
+
+  -- neogit
+  {
+    'NeogitOrg/neogit',
+    dependencies = {
+      'nvim-lua/plenary.nvim', -- required
+      'sindrets/diffview.nvim', -- optional - Diff integration
+
+      -- Only one of these is needed, not both.
+      'nvim-telescope/telescope.nvim', -- optional
+      -- "ibhagwan/fzf-lua",              -- optional
+    },
+    config = true,
+  },
+
+  -- neotest
+  { 'nvim-neotest/neotest-python' },
+  {
+    'nvim-neotest/neotest',
+    dependencies = {
+      'kenunq/django-neotest',
+      'nvim-neotest/nvim-nio',
+      'nvim-lua/plenary.nvim',
+      'antoinemadec/FixCursorHold.nvim',
+      'nvim-treesitter/nvim-treesitter',
     },
   },
 
@@ -394,14 +425,17 @@ require('lazy').setup({
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<C-p>p', builtin.find_files, { desc = '[S]earch [F]iles' })
+      --[[ vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' }) ]]
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<C-p>a', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+      --[[ vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' }) ]]
+      vim.keymap.set('n', '<C-p>g', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      --[[ vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' }) ]]
+      vim.keymap.set('n', '<C-p>b', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -501,10 +535,10 @@ require('lazy').setup({
           -- Jump to the type of the word under your cursor.
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
-          map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-
-          -- Fuzzy find all the symbols in your current document.
-          --  Symbols are things like variables, functions, types, etc.
+          -- map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
+          --
+          -- -- Fuzzy find all the symbols in your current document.
+          -- --  Symbols are things like variables, functions, types, etc.
           map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
 
           -- Fuzzy find all the symbols in your current workspace.
@@ -702,12 +736,12 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -799,13 +833,13 @@ require('lazy').setup({
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     -- 'folke/tokyonight.nvim',
-    'fenetikm/falcon',
+    'ellisonleao/gruvbox.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'falcon'
+      vim.cmd.colorscheme 'gruvbox'
       -- vim.cmd 'set termguicolors'
 
       -- You can configure highlights by doing something like:
@@ -929,6 +963,312 @@ require('lazy').setup({
     },
   },
 })
+
+---@diagnostic disable-next-line: missing-fields
+require('neotest').setup {
+  adapters = {
+    require 'neotest-python' {
+      dap = { justMyCode = false },
+    },
+  },
+}
+
+-- from https://github.com/kenunq/django-neotest
+---@diagnostic disable-next-line: missing-fields
+require('neotest').setup {
+  adapters = {
+    require 'django-neotest' {
+      -- Extra arguments for nvim-dap configuration
+      -- See https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for values
+      dap = { justMyCode = false },
+      -- Command line arguments for runner
+      -- Can also be a function to return dynamic values
+      args = { '--log-level', 'DEBUG' },
+      -- Runner to use. Will use pytest if available by default.
+      -- Can be a function to return dynamic value.
+      runner = 'django', -- or "django", "unittest"
+      -- Custom python path for the runner.
+      -- Can be a string or a list of strings.
+      -- Can also be a function to return dynamic value.
+      -- If not provided, the path will be inferred by checking for
+      -- virtual envs in the local directory and for Pipenev/Poetry configs
+      python = '.venv/bin/python',
+      -- Returns if a given file path is a test file.
+      -- NB: This function is called a lot so don't perform any heavy tasks within it.
+      -- is_test_file = function(file_path)
+      --   ...
+      -- end,
+      -- !!EXPERIMENTAL!! Enable shelling out to `pytest` to discover test
+      -- instances for files containing a parametrize mark (default: false)
+      -- pytest_discover_instances = true,
+    },
+  },
+}
+
+-- require('neotest').setup {
+--   runners = {
+--     django = {
+--       command = 'python manage.py test',
+--       file_pattern = { 'tests/test_*.py' },
+--     },
+--   },
+-- }
+
+-- Configure neogit
+local neogit = require 'neogit'
+
+neogit.setup {
+  -- Hides the hints at the top of the status buffer
+  disable_hint = false,
+  -- Disables changing the buffer highlights based on where the cursor is.
+  disable_context_highlighting = false,
+  -- Disables signs for sections/items/hunks
+  disable_signs = false,
+  -- Changes what mode the Commit Editor starts in. `true` will leave nvim in normal mode, `false` will change nvim to
+  -- insert mode, and `"auto"` will change nvim to insert mode IF the commit message is empty, otherwise leaving it in
+  -- normal mode.
+  disable_insert_on_commit = 'auto',
+  -- When enabled, will watch the `.git/` directory for changes and refresh the status buffer in response to filesystem
+  -- events.
+  filewatcher = {
+    interval = 1000,
+    enabled = true,
+  },
+  -- "ascii"   is the graph the git CLI generates
+  -- "unicode" is the graph like https://github.com/rbong/vim-flog
+  graph_style = 'unicode',
+  -- Used to generate URL's for branch popup action "pull request".
+  git_services = {
+    ['github.com'] = 'https://github.com/${owner}/${repository}/compare/${branch_name}?expand=1',
+    ['bitbucket.org'] = 'https://bitbucket.org/${owner}/${repository}/pull-requests/new?source=${branch_name}&t=1',
+    ['gitlab.com'] = 'https://gitlab.com/${owner}/${repository}/merge_requests/new?merge_request[source_branch]=${branch_name}',
+  },
+  -- Allows a different telescope sorter. Defaults to 'fuzzy_with_index_bias'. The example below will use the native fzf
+  -- sorter instead. By default, this function returns `nil`.
+  telescope_sorter = function()
+    return require('telescope').extensions.fzf.native_fzf_sorter()
+  end,
+  -- Persist the values of switches/options within and across sessions
+  remember_settings = true,
+  -- Scope persisted settings on a per-project basis
+  use_per_project_settings = true,
+  -- Table of settings to never persist. Uses format "Filetype--cli-value"
+  ignored_settings = {
+    'NeogitPushPopup--force-with-lease',
+    'NeogitPushPopup--force',
+    'NeogitPullPopup--rebase',
+    'NeogitCommitPopup--allow-empty',
+    'NeogitRevertPopup--no-edit',
+  },
+  -- Configure highlight group features
+  highlight = {
+    italic = true,
+    bold = true,
+    underline = true,
+  },
+  -- Set to false if you want to be responsible for creating _ALL_ keymappings
+  use_default_keymaps = true,
+  -- Neogit refreshes its internal state after specific events, which can be expensive depending on the repository size.
+  -- Disabling `auto_refresh` will make it so you have to manually refresh the status after you open it.
+  auto_refresh = true,
+  -- Value used for `--sort` option for `git branch` command
+  -- By default, branches will be sorted by commit date descending
+  -- Flag description: https://git-scm.com/docs/git-branch#Documentation/git-branch.txt---sortltkeygt
+  -- Sorting keys: https://git-scm.com/docs/git-for-each-ref#_options
+  sort_branches = '-committerdate',
+  -- Change the default way of opening neogit
+  kind = 'tab',
+  -- Disable line numbers and relative line numbers
+  disable_line_numbers = true,
+  -- The time after which an output console is shown for slow running commands
+  console_timeout = 2000,
+  -- Automatically show console if a command takes more than console_timeout milliseconds
+  auto_show_console = true,
+  status = {
+    recent_commit_count = 10,
+  },
+  commit_editor = {
+    kind = 'auto',
+  },
+  commit_select_view = {
+    kind = 'tab',
+  },
+  commit_view = {
+    kind = 'vsplit',
+    verify_commit = os.execute 'which gpg' == 0, -- Can be set to true or false, otherwise we try to find the binary
+  },
+  log_view = {
+    kind = 'tab',
+  },
+  rebase_editor = {
+    kind = 'auto',
+  },
+  reflog_view = {
+    kind = 'tab',
+  },
+  merge_editor = {
+    kind = 'auto',
+  },
+  tag_editor = {
+    kind = 'auto',
+  },
+  preview_buffer = {
+    kind = 'split',
+  },
+  popup = {
+    kind = 'split',
+  },
+  signs = {
+    -- { CLOSED, OPENED }
+    hunk = { '', '' },
+    item = { '>', 'v' },
+    section = { '>', 'v' },
+  },
+  -- Each Integration is auto-detected through plugin presence, however, it can be disabled by setting to `false`
+  integrations = {
+    -- If enabled, use telescope for menu selection rather than vim.ui.select.
+    -- Allows multi-select and some things that vim.ui.select doesn't.
+    telescope = nil,
+    -- Neogit only provides inline diffs. If you want a more traditional way to look at diffs, you can use `diffview`.
+    -- The diffview integration enables the diff popup.
+    --
+    -- Requires you to have `sindrets/diffview.nvim` installed.
+    diffview = nil,
+
+    -- If enabled, uses fzf-lua for menu selection. If the telescope integration
+    -- is also selected then telescope is used instead
+    -- Requires you to have `ibhagwan/fzf-lua` installed.
+    fzf_lua = nil,
+  },
+  sections = {
+    -- Reverting/Cherry Picking
+    sequencer = {
+      folded = false,
+      hidden = false,
+    },
+    untracked = {
+      folded = false,
+      hidden = false,
+    },
+    unstaged = {
+      folded = false,
+      hidden = false,
+    },
+    staged = {
+      folded = false,
+      hidden = false,
+    },
+    stashes = {
+      folded = true,
+      hidden = false,
+    },
+    unpulled_upstream = {
+      folded = true,
+      hidden = false,
+    },
+    unmerged_upstream = {
+      folded = false,
+      hidden = false,
+    },
+    unpulled_pushRemote = {
+      folded = true,
+      hidden = false,
+    },
+    unmerged_pushRemote = {
+      folded = false,
+      hidden = false,
+    },
+    recent = {
+      folded = true,
+      hidden = false,
+    },
+    rebase = {
+      folded = true,
+      hidden = false,
+    },
+  },
+  mappings = {
+    commit_editor = {
+      ['q'] = 'Close',
+      ['<c-c><c-c>'] = 'Submit',
+      ['<c-c><c-k>'] = 'Abort',
+    },
+    rebase_editor = {
+      ['p'] = 'Pick',
+      ['r'] = 'Reword',
+      ['e'] = 'Edit',
+      ['s'] = 'Squash',
+      ['f'] = 'Fixup',
+      ['x'] = 'Execute',
+      ['d'] = 'Drop',
+      ['b'] = 'Break',
+      ['q'] = 'Close',
+      ['<cr>'] = 'OpenCommit',
+      ['gk'] = 'MoveUp',
+      ['gj'] = 'MoveDown',
+      ['<c-c><c-c>'] = 'Submit',
+      ['<c-c><c-k>'] = 'Abort',
+    },
+    finder = {
+      ['<cr>'] = 'Select',
+      ['<c-c>'] = 'Close',
+      ['<esc>'] = 'Close',
+      ['<c-n>'] = 'Next',
+      ['<c-p>'] = 'Previous',
+      ['<down>'] = 'Next',
+      ['<up>'] = 'Previous',
+      ['<tab>'] = 'MultiselectToggleNext',
+      ['<s-tab>'] = 'MultiselectTogglePrevious',
+      ['<c-j>'] = 'NOP',
+    },
+    -- Setting any of these to `false` will disable the mapping.
+    popup = {
+      ['?'] = 'HelpPopup',
+      ['A'] = 'CherryPickPopup',
+      ['D'] = 'DiffPopup',
+      ['M'] = 'RemotePopup',
+      ['P'] = 'PushPopup',
+      ['X'] = 'ResetPopup',
+      ['Z'] = 'StashPopup',
+      ['b'] = 'BranchPopup',
+      ['c'] = 'CommitPopup',
+      ['f'] = 'FetchPopup',
+      ['l'] = 'LogPopup',
+      ['m'] = 'MergePopup',
+      ['p'] = 'PullPopup',
+      ['r'] = 'RebasePopup',
+      ['v'] = 'RevertPopup',
+      ['w'] = 'WorktreePopup',
+    },
+    status = {
+      ['q'] = 'Close',
+      ['I'] = 'InitRepo',
+      ['1'] = 'Depth1',
+      ['2'] = 'Depth2',
+      ['3'] = 'Depth3',
+      ['4'] = 'Depth4',
+      ['<tab>'] = 'Toggle',
+      ['x'] = 'Discard',
+      ['s'] = 'Stage',
+      ['S'] = 'StageUnstaged',
+      ['<c-s>'] = 'StageAll',
+      ['u'] = 'Unstage',
+      ['U'] = 'UnstageStaged',
+      ['$'] = 'CommandHistory',
+      ['#'] = 'Console',
+      ['Y'] = 'YankSelected',
+      ['<c-r>'] = 'RefreshBuffer',
+      ['<enter>'] = 'GoToFile',
+      ['<c-v>'] = 'VSplitOpen',
+      ['<c-x>'] = 'SplitOpen',
+      ['<c-t>'] = 'TabOpen',
+      ['{'] = 'GoToPreviousHunkHeader',
+      ['}'] = 'GoToNextHunkHeader',
+    },
+  },
+}
+
+require('luasnip').filetype_extend('htmldjango', { 'html' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
