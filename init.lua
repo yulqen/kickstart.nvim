@@ -191,6 +191,7 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- neotest keybinds
+vim.keymap.set('n', 'dn', ':lua require("neotest").run.run({strategy = "dap"})')
 vim.keymap.set('n', 'tn', ':lua require("neotest").run.run()<CR>', { desc = 'Test nearest' })
 vim.keymap.set('n', 'tf', ':lua require("neotest").run.run(vim.fn.expand("%"))<CR>', { desc = 'Test file' })
 vim.keymap.set('n', 'to', ':lua require("neotest").output.open({ enter = true })<CR>')
@@ -267,6 +268,197 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
     },
+  },
+
+  -- python automatic import
+  {
+    'stevanmilic/nvim-lspimport',
+  },
+
+  -- dap
+  {
+    'mfussenegger/nvim-dap',
+    dependencies = {
+
+      -- python
+      { 'mfussenegger/nvim-dap-python' },
+
+      -- fancy UI for the debugger
+      {
+        'rcarriga/nvim-dap-ui',
+        dependencies = { 'nvim-neotest/nvim-nio' },
+        -- stylua: ignore
+        keys = {
+          { "<leader>du", function() require("dapui").toggle({ }) end, desc = "Dap UI" },
+          { "<leader>de", function() require("dapui").eval() end, desc = "Eval", mode = {"n", "v"} },
+        },
+        opts = {},
+        config = function(_, opts)
+          -- setup dap config by VsCode launch.json file
+          -- require("dap.ext.vscode").load_launchjs()
+          local dap = require 'dap'
+          local dapui = require 'dapui'
+          dapui.setup(opts)
+          dap.listeners.after.event_initialized['dapui_config'] = function()
+            dapui.open {}
+          end
+          dap.listeners.before.event_terminated['dapui_config'] = function()
+            dapui.close {}
+          end
+          dap.listeners.before.event_exited['dapui_config'] = function()
+            dapui.close {}
+          end
+        end,
+        keys = {
+          {
+            '<leader>dB',
+            function()
+              require('dap').set_breakpoint(vim.fn.input 'Breakpoint condition: ')
+            end,
+            desc = 'Breakpoint Condition',
+          },
+          {
+            '<leader>db',
+            function()
+              require('dap').toggle_breakpoint()
+            end,
+            desc = 'Toggle Breakpoint',
+          },
+          {
+            '<leader>dc',
+            function()
+              require('dap').continue()
+            end,
+            desc = 'Continue',
+          },
+          {
+            '<leader>da',
+            function()
+              require('dap').continue { before = get_args }
+            end,
+            desc = 'Run with Args',
+          },
+          {
+            '<leader>dC',
+            function()
+              require('dap').run_to_cursor()
+            end,
+            desc = 'Run to Cursor',
+          },
+          {
+            '<leader>dg',
+            function()
+              require('dap').goto_()
+            end,
+            desc = 'Go to Line (No Execute)',
+          },
+          {
+            '<leader>di',
+            function()
+              require('dap').step_into()
+            end,
+            desc = 'Step Into',
+          },
+          {
+            '<leader>dj',
+            function()
+              require('dap').down()
+            end,
+            desc = 'Down',
+          },
+          {
+            '<leader>dk',
+            function()
+              require('dap').up()
+            end,
+            desc = 'Up',
+          },
+          {
+            '<leader>dl',
+            function()
+              require('dap').run_last()
+            end,
+            desc = 'Run Last',
+          },
+          {
+            '<leader>do',
+            function()
+              require('dap').step_out()
+            end,
+            desc = 'Step Out',
+          },
+          {
+            '<leader>dO',
+            function()
+              require('dap').step_over()
+            end,
+            desc = 'Step Over',
+          },
+          {
+            '<leader>dp',
+            function()
+              require('dap').pause()
+            end,
+            desc = 'Pause',
+          },
+          {
+            '<leader>dr',
+            function()
+              require('dap').repl.toggle()
+            end,
+            desc = 'Toggle REPL',
+          },
+          {
+            '<leader>ds',
+            function()
+              require('dap').session()
+            end,
+            desc = 'Session',
+          },
+          {
+            '<leader>dt',
+            function()
+              require('dap').terminate()
+            end,
+            desc = 'Terminate',
+          },
+          {
+            '<leader>dw',
+            function()
+              require('dap.ui.widgets').hover()
+            end,
+            desc = 'Widgets',
+          },
+        },
+      },
+    },
+  },
+
+  {
+    'rcarriga/nvim-dap-ui',
+    dependencies = { 'nvim-neotest/nvim-nio' },
+  -- stylua: ignore
+  keys = {
+    { "<leader>du", function() require("dapui").toggle({ }) end, desc = "Dap UI" },
+    { "<leader>de", function() require("dapui").eval() end, desc = "Eval", mode = {"n", "v"} },
+  },
+    opts = {},
+    config = function(_, opts)
+      -- setup dap config by VsCode launch.json file
+      -- require("dap.ext.vscode").load_launchjs()
+      local dap = require 'dap'
+      local dapui = require 'dapui'
+      dapui.setup(opts)
+      dap.listeners.after.event_initialized['dapui_config'] = function()
+        dapui.open {}
+      end
+      dap.listeners.before.event_terminated['dapui_config'] = function()
+        dapui.close {}
+      end
+      dap.listeners.before.event_exited['dapui_config'] = function()
+        dapui.close {}
+      end
+    end,
   },
 
   -- neogit
@@ -624,6 +816,7 @@ require('lazy').setup({
         clangd = {},
         gopls = {},
         pyright = {},
+        shellcheck = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -663,6 +856,7 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'shellcheck', -- for bash scripts
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -698,7 +892,6 @@ require('lazy').setup({
       notify_on_error = false,
       format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true }
         return {
@@ -843,7 +1036,8 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'gruvbox'
+      vim.cmd.colorscheme 'lunaperche'
+
       -- vim.cmd 'set termguicolors'
 
       -- You can configure highlights by doing something like:
@@ -1273,6 +1467,11 @@ neogit.setup {
 }
 
 require('luasnip').filetype_extend('htmldjango', { 'html' })
+
+require('dap-python').setup '~/src/virtualenvs/debugpy/bin/python'
+
+-- automatic imports for python
+vim.keymap.set('n', '<leader>A', require('lspimport').import, { noremap = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
