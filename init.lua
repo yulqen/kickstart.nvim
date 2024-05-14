@@ -815,8 +815,27 @@ require('lazy').setup({
       local servers = {
         clangd = {},
         gopls = {},
-        pyright = {},
+        pyright = {
+          settings = {
+            pyright = {
+              -- Using Ruff's import organizer
+              disableOrganizeImports = true,
+            },
+            python = {
+              analysis = {
+                -- Ignore all files for analysis to exclusively use Ruff for linting
+                ignore = { '*' },
+              },
+            },
+          },
+        },
         shellcheck = {},
+        ruff = {
+          settings = {
+            -- Any extra CLI arguments for `ruff` go here.
+            args = {},
+          },
+        },
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -857,6 +876,8 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         'shellcheck', -- for bash scripts
+        'ruff', -- for python
+        'pyright', -- for python
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
