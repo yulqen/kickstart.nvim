@@ -111,6 +111,11 @@ vim.opt.relativenumber = true
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
 
+-- djagnostics on float (switches off virtual text below too for lsp)
+-- https://stackoverflow.com/questions/69290794/nvim-lsp-change-lspconfig-diagnostic-message-location
+vim.o.updatetime = 250
+vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
+
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
@@ -897,7 +902,11 @@ require('lazy').setup({
           end,
         },
       }
-      require('lspconfig').pyright.setup {}
+      require('lspconfig').pyright.setup {
+        vim.diagnostic.config {
+          virtual_text = false,
+        },
+      }
       require('lspconfig').tsserver.setup {}
     end,
   },
