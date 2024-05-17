@@ -114,7 +114,9 @@ vim.opt.mouse = 'a'
 -- djagnostics on float (switches off virtual text below too for lsp)
 -- https://stackoverflow.com/questions/69290794/nvim-lsp-change-lspconfig-diagnostic-message-location
 vim.o.updatetime = 250
-vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
+
+-- UNCOMMENT this if you want to see the diagnostics "float" on cursor hover
+--vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
 
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
@@ -202,7 +204,7 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 vim.keymap.set('n', '<tab>', ':tabnext<CR>', { desc = 'Move to next tab' })
 
 -- neotest keybinds
-vim.keymap.set('n', 'dn', ':lua require("neotest").run.run({strategy = "dap"})')
+vim.keymap.set('n', 'dn', ':lua require("neotest").run.run({strategy = "dap"})<CR>')
 vim.keymap.set('n', 'tn', ':lua require("neotest").run.run()<CR>', { desc = 'Test nearest' })
 vim.keymap.set('n', 'tf', ':lua require("neotest").run.run(vim.fn.expand("%"))<CR>', { desc = 'Test file' })
 vim.keymap.set('n', 'to', ':lua require("neotest").output.open({ enter = true })<CR>')
