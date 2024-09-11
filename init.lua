@@ -1,4 +1,4 @@
---[[
+--[[iniini
 init
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
@@ -662,15 +662,15 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<C-p>p', builtin.find_files, { desc = '[S]earch [F]iles' })
-      --[[ vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' }) ]]
+      --vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<C-p>a', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      --[[ vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' }) ]]
+      vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<C-p>g', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-      vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      --[[ vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' }) ]]
+      vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Fises ("." for repeat)' })
+      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
       vim.keymap.set('n', '<C-p>b', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
@@ -868,11 +868,13 @@ require('lazy').setup({
       local servers = {
         clangd = {},
         gopls = {},
+        tailwindcss = {},
         pyright = {
           settings = {
             pyright = {
               -- Using Ruff's import organizer
               disableOrganizeImports = true,
+              autoImportCompletion = true,
             },
             python = {
               analysis = {
@@ -883,12 +885,6 @@ require('lazy').setup({
           },
         },
         shellcheck = {},
-        ruff = {
-          settings = {
-            -- Any extra CLI arguments for `ruff` go here.
-            args = {},
-          },
-        },
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -929,8 +925,8 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         'shellcheck', -- for bash scripts
-        'ruff', -- for python
         'pyright', -- for python
+        'tailwindcss', -- for tailwind
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -947,14 +943,33 @@ require('lazy').setup({
         },
       }
       require('lspconfig').pyright.setup {
-        vim.diagnostic.config {
-          virtual_text = false,
+        settings = {
+          pyright = {
+            -- Using Ruff's import organizer
+            disableOrganizeImports = true,
+          },
+          python = {
+            analysis = {
+              -- Ignore all files for analysis to exclusively use Ruff for linting
+              ignore = { '*' },
+            },
+          },
+        },
+      }
+      require('lspconfig').ruff.setup {
+        init_options = {
+          settings = {
+            -- Ruff language server settings go here
+            logFile = '/tmp/ruff.log',
+          },
         },
       }
       require('lspconfig').ts_ls.setup {}
+      require('lspconfig').tailwindcss.setup {
+        filetypes = { 'html', 'css', 'less', 'sass', 'scss', 'postcss', 'htmldjango' },
+      }
     end,
   },
-
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -1117,6 +1132,7 @@ require('lazy').setup({
           { name = 'luasnip' },
           { name = 'path' },
           { name = 'cody' },
+          { name = 'tailwindcss' },
         },
       }
     end,
@@ -1129,7 +1145,8 @@ require('lazy').setup({
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     -- 'folke/tokyonight.nvim',
     --'ellisonleao/gruvbox.nvim',
-    'ayu-theme/ayu-vim',
+    --'ayu-theme/ayu-vim',
+    'rose-pine/neovim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
@@ -1138,8 +1155,9 @@ require('lazy').setup({
       -- vim.cmd.colorscheme 'darkblue'
 
       vim.cmd 'set termguicolors'
-      vim.cmd.colorscheme 'ayu'
-      vim.g.ayucolor = 'dark'
+      -- vim.cmd.colorscheme 'ayu'
+      -- vim.g.ayucolor = 'dark'
+      vim.cmd.colorscheme 'rose-pine'
 
       -- You can configure highlights by doing something like:
       -- vim.cmd.hi 'Comment gui=none'

@@ -3,11 +3,14 @@
 --
 -- See the kickstart.nvim README for more information
 return {
-
   {
     'ayu-theme/ayu-vim',
     opts = {
       ayucolor = 'dark',
     },
+  },
+  {
+    'rose-pine/neovim',
+    name = 'rose-pine',
   },
 }
