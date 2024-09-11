@@ -284,6 +284,9 @@ require('lazy').setup({
   -- python automatic import
   {
     'stevanmilic/nvim-lspimport',
+    config = function()
+      vim.keymap.set('n', '<leader>5', require('lspimport').import, { noremap = true })
+    end,
   },
 
   -- dap
@@ -869,21 +872,7 @@ require('lazy').setup({
         clangd = {},
         gopls = {},
         tailwindcss = {},
-        pyright = {
-          settings = {
-            pyright = {
-              -- Using Ruff's import organizer
-              disableOrganizeImports = true,
-              autoImportCompletion = true,
-            },
-            python = {
-              analysis = {
-                -- Ignore all files for analysis to exclusively use Ruff for linting
-                ignore = { '*' },
-              },
-            },
-          },
-        },
+        pyright = {},
         shellcheck = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -947,11 +936,13 @@ require('lazy').setup({
           pyright = {
             -- Using Ruff's import organizer
             disableOrganizeImports = true,
+            autoImportCompletion = true,
           },
           python = {
             analysis = {
               -- Ignore all files for analysis to exclusively use Ruff for linting
-              ignore = { '*' },
+              --ignore = { '*' },
+              typeCheckingMode = 'standard',
             },
           },
         },
