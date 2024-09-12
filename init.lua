@@ -186,6 +186,8 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+vim.keymap.set('n', '<C-u>', '<C-o>', { noremap = true, silent = true })
+
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -513,8 +515,11 @@ require('lazy').setup({
   -- Sourcegraph for Cody
   {
     'sourcegraph/sg.nvim',
+    lazy = false,
     dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
-    opts = {},
+    config = function()
+      require('sg').setup()
+    end,
   },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
@@ -915,6 +920,7 @@ require('lazy').setup({
         'stylua', -- Used to format Lua code
         'shellcheck', -- for bash scripts
         'pyright', -- for python
+        'markdownlint', -- for markdown
         'tailwindcss', -- for tailwind
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
