@@ -1,4 +1,5 @@
 --[[iniini
+--Assertions.
 init
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
@@ -449,6 +450,34 @@ require('lazy').setup({
       },
     },
   },
+  {
+    'ellisonleao/gruvbox.nvim',
+    config = function()
+      require('gruvbox').setup {
+        terminal_colors = true, -- add neovim terminal colors
+        undercurl = true,
+        underline = true,
+        bold = true,
+        italic = {
+          strings = false,
+          emphasis = false,
+          comments = true,
+          operators = false,
+          folds = true,
+        },
+        strikethrough = true,
+        invert_selection = false,
+        invert_signs = false,
+        invert_tabline = false,
+        inverse = true, -- invert background for search, diffs, statuslines and errors
+        contrast = 'hard', -- can be "hard", "soft" or empty string
+        palette_overrides = {},
+        overrides = {},
+        dim_inactive = false,
+        transparent_mode = false,
+      }
+    end,
+  },
 
   {
     'rcarriga/nvim-dap-ui',
@@ -491,17 +520,41 @@ require('lazy').setup({
     config = true,
   },
 
-  -- neotest
-  { 'nvim-neotest/neotest-python' },
+  {
+    'rcasia/neotest-java',
+    ft = 'java',
+    dependencies = {
+      'mfussenegger/nvim-jdtls',
+      'mfussenegger/nvim-dap', -- for the debugger
+      'rcarriga/nvim-dap-ui', -- recommended
+      'theHamsta/nvim-dap-virtual-text', -- recommended
+    },
+  },
   {
     'nvim-neotest/neotest',
     dependencies = {
-      'kenunq/django-neotest',
       'nvim-neotest/nvim-nio',
       'nvim-lua/plenary.nvim',
       'antoinemadec/FixCursorHold.nvim',
       'nvim-treesitter/nvim-treesitter',
     },
+    opts = {
+      adapters = {
+        require('neotest-java')({
+          -- config here
+          junit_jar = nil, -- default: stdpath(data) .. /nvim/neotest-java/junit-platform-console-standalone-[version].jar
+          incremental_build = true,
+        }),
+        require 'neotest-python' {
+          dap = { justMyCode = false },
+        },
+      },
+    },
+  },
+
+
+  {
+    'olrtg/emmet-language-server',
   },
 
   -- Glow markdown preview
@@ -512,15 +565,15 @@ require('lazy').setup({
     end,
   },
 
-  -- Sourcegraph for Cody
-  {
-    'sourcegraph/sg.nvim',
-    lazy = false,
-    dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
-    config = function()
-      require('sg').setup()
-    end,
-  },
+  -- -- Sourcegraph for Cody
+  -- {
+  --   'sourcegraph/sg.nvim',
+  --   lazy = false,
+  --   dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
+  --   config = function()
+  --     require('sg').setup()
+  --   end,
+  -- },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
@@ -728,6 +781,7 @@ require('lazy').setup({
       { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
+      'nvim-java/nvim-java',
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
@@ -922,6 +976,7 @@ require('lazy').setup({
         'pyright', -- for python
         'markdownlint', -- for markdown
         'tailwindcss', -- for tailwind
+        'jdtls', -- for java
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -964,6 +1019,15 @@ require('lazy').setup({
       require('lspconfig').ts_ls.setup {}
       require('lspconfig').tailwindcss.setup {
         filetypes = { 'html', 'css', 'less', 'sass', 'scss', 'postcss', 'htmldjango' },
+      }
+    end,
+    jdtls = function()
+      require('java').setup {
+        -- Your custom jdtls settings goes here
+      }
+
+      require('lspconfig').jdtls.setup {
+        -- Your custom nvim-java configuration goes here
       }
     end,
   },
@@ -1141,9 +1205,10 @@ require('lazy').setup({
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     -- 'folke/tokyonight.nvim',
-    --'ellisonleao/gruvbox.nvim',
+    'ellisonleao/gruvbox.nvim',
     --'ayu-theme/ayu-vim',
-    'rose-pine/neovim',
+    --'rose-pine/neovim',
+    --'industry',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
@@ -1154,7 +1219,8 @@ require('lazy').setup({
       vim.cmd 'set termguicolors'
       -- vim.cmd.colorscheme 'ayu'
       -- vim.g.ayucolor = 'dark'
-      vim.cmd.colorscheme 'rose-pine'
+      vim.o.background = 'dark'
+      vim.cmd.colorscheme 'gruvbox'
 
       -- You can configure highlights by doing something like:
       -- vim.cmd.hi 'Comment gui=none'
@@ -1207,7 +1273,7 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'ruby', 'query', 'vim', 'vimdoc', 'java' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -1271,11 +1337,17 @@ require('lazy').setup({
   },
 })
 
+-- Run :NeotestJava setup
+vim.cmd("NeotestJava setup")
+
 ---@diagnostic disable-next-line: missing-fields
 require('neotest').setup {
   adapters = {
     require 'neotest-python' {
       dap = { justMyCode = false },
+    },
+    require 'neotest-java' {
+      -- configuration options
     },
   },
 }
