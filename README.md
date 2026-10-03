@@ -107,6 +107,56 @@ Three layers:
 All the drag/slurp/barf keys are dot-repeatable (`.` repeats). Conjure chords
 (`ee`, `eb`, `lS`, …) are unaffected — no overlaps.
 
+## Setting up a new machine
+
+The config is portable: git clone + a handful of system deps, everything
+else self-installs on first launch.
+
+1. **Back up any existing config** (if there was one):
+
+   ```bash
+   mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
+   mv ~/.local/share/nvim ~/.local/share/nvim.bak 2>/dev/null
+   ```
+
+2. **System dependencies** — Neovim >= 0.12, `git`, `gcc`/`make`,
+   `ripgrep`, `fd`, `node`/`npm` (runs the TypeScript LSP), and a
+   clipboard tool (`xclip` / `wl-clipboard`):
+
+   ```bash
+   sudo apt install neovim git build-essential ripgrep fd-find nodejs npm xclip
+   ```
+
+   (Use a PPA/AppImage if the distro ships neovim < 0.12.)
+
+3. **Clone the config** (SSH key must be registered with GitHub):
+
+   ```bash
+   git clone git@github.com:yulqen/kickstart.nvim.git ~/.config/nvim
+   ```
+
+4. **The two tools Mason cannot fetch**:
+
+   ```bash
+   # Clojure CLI
+   curl -O https://download.clojure.org/install/linux-install-1.12.189.sh
+   chmod +x linux-install-1.12.189.sh && sudo ./linux-install-1.12.189.sh
+
+   # cljstyle (not in mason; conform expects it on PATH)
+   curl -sL https://github.com/greglook/cljstyle/releases/latest/download/cljstyle-linux-amd64.tar.gz \
+     | tar xz -C ~/.local/bin cljstyle
+   ```
+
+5. **First launch**: run `nvim` and wait — plugins download, Mason installs
+   the LSP servers (pyright, ruff, marksman, ts_ls, prettierd, djlint,
+   html-lsp, clojure-lsp), treesitter parsers install on first file open.
+   Verify with `:checkhealth lsp treesitter`.
+
+6. **Comic Code** — install the font and set it in the terminal emulator.
+   No Nerd Font needed anywhere (`vim.g.have_nerd_font = false`).
+
+Optional but nice: `lazygit` if you want it outside nvim.
+
 ## See also
 
 - Upstream kickstart docs: [KICKSTART-README.md](KICKSTART-README.md)
