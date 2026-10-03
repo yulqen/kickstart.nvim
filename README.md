@@ -21,6 +21,7 @@ heavily commented, read `init.lua` top to bottom for the full story.
 | Theme: **kanagawa** instead of tokyonight | `wave` (dark, high contrast) / `lotus` (warm paper light). `<Space>tt` toggles |
 | `mini.pairs` enabled | Auto-close brackets/quotes in insert mode (all filetypes) |
 | **nvim-paredit** added | Structural editing for clojure/fennel/scheme/lisp (see below) |
+| **Neogit** added (`<Space>gg`) | Magit-style git status/commit/branch/push UI |
 
 ## Daily driving
 
@@ -71,6 +72,17 @@ them on next start. Status:
       [nvim-jdtls](https://github.com/mfussenegger/nvim-jdtls) rather than
       plain lspconfig (projects/workspaces need it); heaviest setup of the
       lot
+
+## Git workflow
+
+Three layers:
+
+1. **Inline (gitsigns)** — hunks in the sign column: `]c`/`[c` navigate,
+   `<Space>hs`/`hr` stage/reset hunk, `<Space>hb` blame, `<Space>hd` diff,
+   `<Space>hq` hunks to quickfix.
+2. **Neogit (`<Space>gg`)** — magit-style status buffer for commits, branches,
+   push/pull, stash, rebase. `?` shows keys in any menu.
+3. **Outside nvim** — lazygit is installed on the system for terminal use.
 
 ## Structural editing (Clojure & other lisps)
 

@@ -511,6 +511,19 @@ do
     indent = { enabled = true },
   }
 
+  -- [[ Neogit: a magit-style git interface ]]
+  --  Open with `<Space>gg`. Magit-style status buffer + transient menus:
+  --  `s`/`u` stage/unstage (TAB to enter hunks), `c` commit, `b` branch,
+  --  `P` push, `F` pull, `z` stash, `!` shell command. Press `?` anywhere
+  --  to see available keys. Full docs: `:help neogit`
+  vim.pack.add {
+    gh 'NeogitOrg/neogit',
+    gh 'nvim-lua/plenary.nvim', -- neogit dependency
+  }
+  require('neogit').setup {}
+  vim.keymap.set('n', '<leader>gg', function() require('neogit').open() end,
+    { desc = 'Open Neo[G]it (magit-style git)' })
+
   -- [[ mini.nvim ]]
   --  A collection of various small independent plugins/modules
   vim.pack.add { gh 'nvim-mini/mini.nvim' }
