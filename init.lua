@@ -251,6 +251,19 @@ do
     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
     callback = function() vim.hl.on_yank() end,
   })
+
+  -- Detect Django/Jinja templates as the `htmldjango` filetype so the right
+  -- LSP, formatters and highlighting attach. Two conventions are covered:
+  --   - dedicated template extensions (*.jinja, *.jinja2, *.djhtml)
+  --   - any *.html file inside a `templates/` directory (Django convention)
+  -- For one-off files outside these conventions use `:set filetype=htmldjango`
+  -- or add a modeline: `<!-- vim: set filetype=htmldjango: -->`
+  vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+    desc = 'Detect Django/Jinja templates as htmldjango',
+    group = vim.api.nvim_create_augroup('kickstart-htmldjango-ft', { clear = true }),
+    pattern = { '*.jinja', '*.jinja2', '*.djhtml', '*/templates/*.html' },
+    callback = function(args) vim.bo[args.buf].filetype = 'htmldjango' end,
+  })
 end
 
 -- ============================================================
@@ -467,6 +480,18 @@ do
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
   require('todo-comments').setup { signs = false }
+
+  -- [[ Conjure: REPL-driven Clojure / ClojureScript development ]]
+  --  Starts/attaches automatically when you open a .clj/.cljs/.edn file.
+  --  Typical workflow:
+  --    1. start a REPL in a terminal: `clj -M:dev` or `npx shadow-cljs watch app`
+  --    2. open a clojure file; conjure connects (client status in the log)
+  --    3. evaluate: `<localleader>ee` (element/form), `<localleader>eb` (buffer),
+  --       `<localleader>!e` (form + print result as comment)
+  --       `<localleader>lS` opens the log split; `<localleader>rc` stops the session
+  --  Since `maplocalleader` is `<Space>`, chords look like ` SPC e e`.
+  --  Full docs: `:help conjure`
+  vim.pack.add { gh 'Olical/conjure' }
 
   -- [[ mini.nvim ]]
   --  A collection of various small independent plugins/modules
@@ -773,6 +798,21 @@ do
     -- But for many setups, the LSP (`rust_analyzer`) will work just fine
     -- rust_analyzer = {},
 
+    -- JavaScript / TypeScript (requires `npm` on PATH; mason installs
+    -- typescript-language-server for it)
+    ts_ls = {},
+
+    -- HTML — also attached to Django templates (`htmldjango`); provides
+    -- tag/attribute completion, hover and validation inside templates
+    html = { filetypes = { 'html', 'htmldjango' } },
+
+    -- Markdown
+    marksman = {},
+
+    -- Clojure / ClojureScript (both use the same LSP). Requires the `clojure`
+    -- CLI on PATH for classpath analysis (already installed system-wide)
+    clojure_lsp = {},
+
     stylua = {}, -- Used to format Lua code
 
     -- Special Lua Config, as recommended by neovim help docs
@@ -833,6 +873,10 @@ do
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
     -- You can add other tools here that you want Mason to install
+    'prettierd', -- markdown / js / ts formatting (conform)
+    'djlint', -- django/jinja template lint + format (conform)
+    -- NOTE: cljstyle (clojure formatting) is expected on PATH instead:
+    -- it is not in mason, but is already installed system-wide
   })
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -870,6 +914,11 @@ do
     -- You can also specify external formatters in here.
     formatters_by_ft = {
       python = { 'ruff_organize_imports', 'ruff_format' },
+      markdown = { 'prettierd' },
+      javascript = { 'prettierd', stop_after_first = true },
+      typescript = { 'prettierd', stop_after_first = true },
+      htmldjango = { 'djlint' }, -- NOT plain `html`: prettier would mangle {% %} tags
+      clojure = { 'cljstyle' }, -- from PATH, not mason
       -- rust = { 'rustfmt' },
       -- Conform can also run multiple formatters sequentially
       -- python = { "isort", "black" },

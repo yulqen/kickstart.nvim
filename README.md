@@ -45,25 +45,22 @@ Enabled servers live in the `servers` table in `init.lua`; mason auto-installs
 them on next start. Status:
 
 - [x] **Python** — pyright + ruff (done)
-- [ ] **Markdown** — `marksman` LSP; conform formatter (`prettierd` or
-      `markdownlint`); treesitter `markdown`/`markdown_inline` parsers
-      (treesitter is auto-installed already)
-- [ ] **Django (python side)** — covered by pyright; add
-      `django-stubs`-aware settings if needed; `ruff` has
-      `django` lint rules via `[tool.ruff.lint] select = ["DJ"]`
-- [ ] **Django templates** — filetype `htmldjango`; treesitter `django`
-      parser; HTML LSP (`html`) attached to `htmldjango`; `djlint` for
-      lint/format via conform; optional `emmet` for abbreviation expansion
-- [ ] **JavaScript** — `ts_ls` LSP (needs `npm`); conform `prettierd`;
-      treesitter `javascript`/`typescript`/`tsx`
-- [ ] **Clojure/ClojureScript** — `clojure_lsp` (the big one: completion,
-      refactorings, navigation); treesitter `clojure`; optional but
-      recommended: [conjure](https://github.com/Olical/conjure) for
-      connected REPL-driven dev; formatter: `cljstyle` or zprint via conform
-- [ ] **Java** — `jdtls`, ideally via
+- [x] **Markdown** — `marksman` LSP; `prettierd` formatter (done)
+- [x] **Django (python side)** — covered by pyright + ruff (done)
+- [x] **Django templates** — `htmldjango` filetype detection (see the
+      autocmd in `init.lua`: `templates/` dirs, `*.jinja*`, `*.djhtml`);
+      HTML LSP attached to `htmldjango`; `djlint` formatter (done)
+- [x] **JavaScript** — `ts_ls` LSP; `prettierd` formatter (done; needs `npm`)
+- [x] **Clojure/ClojureScript** — `clojure_lsp` + `cljstyle` (on PATH) +
+      [conjure](https://github.com/Olical/conjure) for connected REPL dev
+      (done; needs the `clojure` CLI). Workflow: start a REPL
+      (`clj -M:dev` / `npx shadow-cljs watch app`), open a `.clj`/`.cljs`
+      file, evaluate with `<Space>ee` (form) / `<Space>eb` (buffer);
+      `<Space>lS` opens the log split. Docs: `:help conjure`
+- [ ] **Java** — deferred. Plan: `jdtls` via
       [nvim-jdtls](https://github.com/mfussenegger/nvim-jdtls) rather than
       plain lspconfig (projects/workspaces need it); heaviest setup of the
-      lot, do last
+      lot
 
 ## See also
 
