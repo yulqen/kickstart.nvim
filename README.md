@@ -57,6 +57,14 @@ them on next start. Status:
       (`clj -M:dev` / `npx shadow-cljs watch app`), open a `.clj`/`.cljs`
       file, evaluate with `<Space>ee` (form) / `<Space>eb` (buffer);
       `<Space>lS` opens the log split. Docs: `:help conjure`
+      - shadow-cljs projects: `:ConjureShadowSelect <build>` (e.g. `diary`)
+        after connecting, or evals land in the JVM clj session
+        (`No such namespace: js` is the tell)
+      - shadow-cljs dashboard: http://localhost:9630; the app itself is
+        served by Django (runserver, `/diary/`) — the open browser tab is
+        the JS runtime evals need
+      - conjure session chords are rebound (`sF`/`sC`/`sN`/`sS`) so the
+        global `<Space>s` search group keeps working in clojure buffers
 - [ ] **Java** — deferred. Plan: `jdtls` via
       [nvim-jdtls](https://github.com/mfussenegger/nvim-jdtls) rather than
       plain lspconfig (projects/workspaces need it); heaviest setup of the

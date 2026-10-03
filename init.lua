@@ -493,6 +493,14 @@ do
   --  Full docs: `:help conjure`
   vim.pack.add { gh 'Olical/conjure' }
 
+  -- Rebind conjure session mappings that would otherwise shadow our global
+  -- <Space>s search group in clojure buffers (buffer-local maps win over
+  -- global ones). Shifted variants are unused by conjure and by us.
+  vim.g['conjure#client#clojure#nrepl#mapping#session_fresh'] = 'sF'
+  vim.g['conjure#client#clojure#nrepl#mapping#session_clone'] = 'sC'
+  vim.g['conjure#client#clojure#nrepl#mapping#session_next'] = 'sN'
+  vim.g['conjure#client#clojure#nrepl#mapping#session_select'] = 'sS'
+
   -- [[ mini.nvim ]]
   --  A collection of various small independent plugins/modules
   vim.pack.add { gh 'nvim-mini/mini.nvim' }
