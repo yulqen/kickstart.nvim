@@ -643,7 +643,16 @@ do
   local builtin = require 'telescope.builtin'
   vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
   vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-  vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+  vim.keymap.set('n', '<leader>sf', function()
+    -- Anchor at the git root so <Space>sf always searches the whole project,
+    -- regardless of which subdirectory nvim was launched from. Falls back to
+    -- the current directory outside git repos. Gitignored files are skipped
+    -- automatically (fd/rg honour .gitignore).
+    builtin.find_files { cwd = vim.fs.root(0, '.git') or vim.uv.cwd() }
+  end, { desc = '[S]earch [F]iles (project)' })
+  -- Strictly git-tracked files only (`git ls-files`) — no ignored or
+  -- untracked files at all
+  vim.keymap.set('n', '<leader>sG', builtin.git_files, { desc = '[S]earch [G]it-tracked files' })
   vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
   vim.keymap.set({ 'n', 'v' }, '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
   vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
