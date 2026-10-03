@@ -501,6 +501,16 @@ do
   vim.g['conjure#client#clojure#nrepl#mapping#session_next'] = 'sN'
   vim.g['conjure#client#clojure#nrepl#mapping#session_select'] = 'sS'
 
+  -- [[ nvim-paredit: structural editing for lisps (clojure, fennel, ...) ]]
+  --  Treesitter-based slurp/barf/drag/raise, plus lisp-aware motions and
+  --  text objects. Needs the treesitter `clojure` parser (auto-installed
+  --  on first open). Full docs: `:help nvim-paredit`
+  vim.pack.add { gh 'julienvincent/nvim-paredit' }
+  require('nvim-paredit').setup {
+    -- Fix indentation of affected forms after slurp/barf
+    indent = { enabled = true },
+  }
+
   -- [[ mini.nvim ]]
   --  A collection of various small independent plugins/modules
   vim.pack.add { gh 'nvim-mini/mini.nvim' }
@@ -526,6 +536,11 @@ do
     },
     n_lines = 500,
   }
+
+  -- Auto-close brackets and quotes in insert mode. Pairs nicely with
+  -- nvim-paredit (below) for structural lisp editing. To restrict it to
+  -- certain filetypes see `:help MiniPairs.config`.
+  require('mini.pairs').setup()
 
   -- Add/delete/replace surroundings (brackets, quotes, etc.)
   --

@@ -19,6 +19,8 @@ heavily commented, read `init.lua` top to bottom for the full story.
 | Python LSP enabled (`pyright`, `ruff`) | Python dev (see below) |
 | conform: python = `ruff_organize_imports` + `ruff_format`, format-on-save on | Auto-format Python on save |
 | Theme: **kanagawa** instead of tokyonight | `wave` (dark, high contrast) / `lotus` (warm paper light). `<Space>tt` toggles |
+| `mini.pairs` enabled | Auto-close brackets/quotes in insert mode (all filetypes) |
+| **nvim-paredit** added | Structural editing for clojure/fennel/scheme/lisp (see below) |
 
 ## Daily driving
 
@@ -69,6 +71,29 @@ them on next start. Status:
       [nvim-jdtls](https://github.com/mfussenegger/nvim-jdtls) rather than
       plain lspconfig (projects/workspaces need it); heaviest setup of the
       lot
+
+## Structural editing (Clojure & other lisps)
+
+**Insert mode:** brackets auto-close (`(` → `()` via mini.pairs — `(`, `[`, `{`, `"` all work.
+
+**nvim-paredit** (treesitter-based; active in clojure/fennel/scheme/lisp buffers):
+
+| Keys | Action |
+|---|---|
+| `>)` / `<)` | Slurp / barf forwards (pull next element in, push last one out) |
+| `<(` / `>(` | Slurp / barf backwards |
+| `>e` / `<e` | Drag element right / left |
+| `>p` / `<p` | Drag key-value pair right / left (maps, let bindings…) |
+| `>f` / `<f` | Drag whole form right / left |
+| `<Space>o` / `<Space>O` | Raise form / element (replace parent with it) |
+| `<Space>@` | Splice (unwrap) form under cursor |
+| `W` / `E` / `B` / `gE` | Jump to element head / tail / prev head / prev tail |
+| `(` / `)` | Jump to parent form start / end, `T` top-level form head |
+| `af` / `if` | Text object: around / inside form (`aF`/`iF` top-level) |
+| `ae` / `ie` | Text object: around / inside element |
+
+All the drag/slurp/barf keys are dot-repeatable (`.` repeats). Conjure chords
+(`ee`, `eb`, `lS`, …) are unaffected — no overlaps.
 
 ## See also
 
