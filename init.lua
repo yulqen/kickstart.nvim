@@ -404,10 +404,31 @@ do
 
   -- Useful plugin to show you pending keybinds.
   vim.pack.add { gh 'folke/which-key.nvim' }
+  local wk_icons = { mappings = vim.g.have_nerd_font }
+  if not vim.g.have_nerd_font then
+    -- `icons.keys` maps special keys (<esc>, <bs>, <space>, ...) to Nerd Font
+    -- glyphs, which render as boxes without a Nerd Font: use plain text instead.
+    wk_icons.keys = {
+      Space = 'SPC ',
+      Esc = '<Esc> ',
+      BS = '<BS> ',
+      CR = '<CR> ',
+      NL = '<CR> ',
+      Tab = '<Tab> ',
+      Up = '<Up> ',
+      Down = '<Down> ',
+      Left = '<Left> ',
+      Right = '<Right> ',
+      C = 'C-',
+      M = 'M-',
+      D = 'D-',
+      S = 'S-',
+    }
+  end
   require('which-key').setup {
     -- Delay between pressing a key and opening which-key (milliseconds)
     delay = 0,
-    icons = { mappings = vim.g.have_nerd_font },
+    icons = wk_icons,
     -- Document existing key chains
     spec = {
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
@@ -423,18 +444,25 @@ do
   -- change the command under that to load whatever the name of that colorscheme is.
   --
   -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-  vim.pack.add { gh 'folke/tokyonight.nvim' }
+  vim.pack.add { gh 'rebelot/kanagawa.nvim' }
   ---@diagnostic disable-next-line: missing-fields
-  require('tokyonight').setup {
-    styles = {
-      comments = { italic = false }, -- Disable italics in comments
-    },
+  require('kanagawa').setup {
+    -- Which variant to use for each `background` value:
+    --   dark:  'wave' (default), 'dragon' (softer), 'zenburn' (dimmer)
+    --   light: 'lotus' (warm paper-like light theme)
+    theme = { dark = 'wave', light = 'lotus' },
+    commentStyle = { italic = false },
   }
 
-  -- Load the colorscheme here.
-  -- Like many other themes, this one has different styles, and you could load
-  -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  vim.cmd.colorscheme 'tokyonight-night'
+  -- Load the colorscheme. Kanagawa follows `background`:
+  -- dark -> 'wave', light -> 'lotus'.
+  vim.cmd.colorscheme 'kanagawa'
+
+  -- Toggle dark/light theme (<Space>tt)
+  vim.keymap.set('n', '<leader>tt', function()
+    vim.o.background = (vim.o.background == 'dark') and 'light' or 'dark'
+    vim.cmd.colorscheme 'kanagawa'
+  end, { desc = '[T]oggle [T]heme (dark/light)' })
 
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
@@ -735,7 +763,8 @@ do
   local servers = {
     -- clangd = {},
     -- gopls = {},
-    -- pyright = {},
+    pyright = {}, -- Python language server: completion, hover, go-to-definition
+    ruff = {}, -- Ruff LSP: diagnostics + quick fixes (pip-audited fast linter)
     -- tsc = {},
     --
     -- Some languages (like rust) have entire language plugins that can be useful:
@@ -827,7 +856,7 @@ do
       -- You can specify filetypes to autoformat on save here:
       local enabled_filetypes = {
         -- lua = true,
-        -- python = true,
+        python = true,
       }
       if enabled_filetypes[vim.bo[bufnr].filetype] then
         return { timeout_ms = 500 }
@@ -840,6 +869,7 @@ do
     },
     -- You can also specify external formatters in here.
     formatters_by_ft = {
+      python = { 'ruff_organize_imports', 'ruff_format' },
       -- rust = { 'rustfmt' },
       -- Conform can also run multiple formatters sequentially
       -- python = { "isort", "black" },
@@ -909,6 +939,14 @@ do
     },
 
     completion = {
+      -- Show plain text labels for completion kinds instead of Nerd Font icons.
+      -- Useful when a Nerd Font is not used in the terminal.
+      menu = {
+        draw = {
+          columns = { { 'label', 'label_description', gap = 1 }, { 'kind' } },
+        },
+      },
+
       -- By default, you may press `<c-space>` to show the documentation.
       -- Optionally, set `auto_show = true` to show the documentation after a delay.
       documentation = { auto_show = false, auto_show_delay_ms = 500 },
