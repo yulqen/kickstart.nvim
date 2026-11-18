@@ -120,14 +120,30 @@ else self-installs on first launch.
    ```
 
 2. **System dependencies** — Neovim >= 0.12, `git`, `gcc`/`make`,
-   `ripgrep`, `fd`, `node`/`npm` (runs the TypeScript LSP), and a
-   clipboard tool (`xclip` / `wl-clipboard`):
+   `ripgrep`, `fd`, `node`/`npm` (runs the TypeScript LSP),
+   `python3-venv` (Mason's pip-based packages) and the `tree-sitter` CLI
+   (nvim-treesitter `main` builds parsers with it). Add `xclip` /
+   `wl-clipboard` only where a real X/Wayland session exists — on a
+   headless box (no `DISPLAY`/`WAYLAND_DISPLAY`) the config hands
+   clipboard duties to the terminal via OSC 52 instead:
 
    ```bash
-   sudo apt install neovim git build-essential ripgrep fd-find nodejs npm xclip
+   sudo apt install git build-essential ripgrep fd-find nodejs npm python3-venv xclip
    ```
 
-   (Use a PPA/AppImage if the distro ships neovim < 0.12.)
+   Distro packages are usually too old (Debian 13 still ships 0.10), so
+   take the release tarball rather than `apt install neovim`:
+
+   ```bash
+   curl -sL -o /tmp/nvim.tar.gz \
+     https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+   sudo tar xzf /tmp/nvim.tar.gz -C /opt
+   sudo mv /opt/nvim-linux-x86_64 /opt/nvim
+   sudo ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
+   ```
+
+   `/usr/local/bin` comes before `/usr/bin` in `PATH`, so this shadows any
+   packaged `nvim`.
 
 3. **Clone the config** (SSH key must be registered with GitHub):
 
@@ -135,17 +151,30 @@ else self-installs on first launch.
    git clone git@github.com:yulqen/kickstart.nvim.git ~/.config/nvim
    ```
 
-4. **The two tools Mason cannot fetch**:
+4. **The three tools Mason cannot fetch**:
 
    ```bash
    # Clojure CLI
    curl -O https://download.clojure.org/install/linux-install-1.12.189.sh
    chmod +x linux-install-1.12.189.sh && sudo ./linux-install-1.12.189.sh
 
-   # cljstyle (not in mason; conform expects it on PATH)
-   curl -sL https://github.com/greglook/cljstyle/releases/latest/download/cljstyle-linux-amd64.tar.gz \
-     | tar xz -C ~/.local/bin cljstyle
+   mkdir -p ~/.local/bin
+
+   # cljstyle (not in mason; conform expects it on PATH). Release assets
+   # are versioned now — bump the tag from the releases page.
+   curl -sL -o /tmp/cljstyle.zip \
+     https://github.com/greglook/cljstyle/releases/download/0.17.642/cljstyle_0.17.642_linux_amd64_static.zip
+   unzip -oq /tmp/cljstyle.zip -d /tmp/cljstyle
+   install -m755 /tmp/cljstyle/cljstyle ~/.local/bin/cljstyle
+
+   # tree-sitter CLI (nvim-treesitter `main` shells out to it)
+   curl -sL -o /tmp/ts.zip \
+     https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-cli-linux-x64.zip
+   unzip -oq /tmp/ts.zip -d /tmp/ts
+   install -m755 /tmp/ts/tree-sitter ~/.local/bin/tree-sitter
    ```
+
+   Check `~/.local/bin` is on `PATH` (`~/.profile` normally does this).
 
 5. **First launch**: run `nvim` and wait — plugins download, Mason installs
    the LSP servers (pyright, ruff, marksman, ts_ls, prettierd, djlint,
@@ -156,6 +185,14 @@ else self-installs on first launch.
    No Nerd Font needed anywhere (`vim.g.have_nerd_font = false`).
 
 Optional but nice: `lazygit` if you want it outside nvim.
+
+```bash
+LG=$(curl -s https://api.github.com/repos/jesseduffield/lazygit/releases/latest \
+  | grep -oP '"tag_name": "v\K[^"]+')
+curl -sL -o /tmp/lg.tar.gz \
+  "https://github.com/jesseduffield/lazygit/releases/download/v$LG/lazygit_${LG}_linux_x86_64.tar.gz"
+tar xzf /tmp/lg.tar.gz -C ~/.local/bin lazygit
+```
 
 ## See also
 

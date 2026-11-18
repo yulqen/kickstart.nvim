@@ -122,6 +122,18 @@ do
   --  Schedule the setting after `UiEnter` because it can increase startup-time.
   --  Remove this option if you want your OS clipboard to remain independent.
   --  See `:help 'clipboard'`
+  --
+  --  With no local display (SSH sessions, the amp container) there is no X or
+  --  Wayland clipboard to talk to, so route yanks through the terminal with
+  --  OSC 52 instead. See `:help clipboard-osc52`.
+  if not vim.env.DISPLAY and not vim.env.WAYLAND_DISPLAY then
+    local osc52 = require('vim.ui.clipboard.osc52')
+    vim.g.clipboard = {
+      name = 'OSC 52',
+      copy = { ['+'] = osc52.copy('+'), ['*'] = osc52.copy('*') },
+      paste = { ['+'] = osc52.paste('+'), ['*'] = osc52.paste('*') },
+    }
+  end
   vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
   -- Enable break indent
